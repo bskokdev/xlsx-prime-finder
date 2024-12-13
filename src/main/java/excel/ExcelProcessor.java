@@ -39,7 +39,7 @@ public class ExcelProcessor {
                     continue;
                 }
 
-                long rowResult = processRow(row);
+                long rowResult = processRow(row, 1);
                 if (rowResult != -1) {
                     log.info("FOUND PRIME: {}", rowResult);
                 }
@@ -49,9 +49,16 @@ public class ExcelProcessor {
         }
     }
 
-    public long processRow(Row row) {
+    /**
+     * Processes a single row in the sheet, including validation.
+     *
+     * @param row       - A single row in the sheet to be processed
+     * @param cellIndex - Index of the cell to process
+     * @return a number if the number is valid and prime, -1 in all other cases
+     */
+    public long processRow(Row row, int cellIndex) {
         int rowNumber = row.getRowNum();
-        Cell secondCell = row.getCell(1); // data are in the second column
+        Cell secondCell = row.getCell(cellIndex); // data are in the second column
         if (!isCellValid(secondCell)) {
             log.debug("Invalid cell value, skipping row: {} (Possibly header or a non-numeric value)", rowNumber);
             return -1;
@@ -104,13 +111,21 @@ public class ExcelProcessor {
         }
     }
 
-    private boolean isPositiveInteger(double num) {
-        return num > 0 && num == Math.floor(num);
+    /**
+     * Checks if a given number is a positive whole number
+     *
+     * @param number - the number to be checked
+     * @return true if the number is a positive integer, otherwise false
+     */
+    private boolean isPositiveInteger(double number) {
+        return number > 0 && number == Math.floor(number);
     }
 
     /**
      * Checks if a number is prime = only divisible by 1 and itself.
-     * Adjusted for larger ranges with long.
+     * Every factor of a prime number is not a prime number
+     * - This is because such number would be divisible by itself, 1, and the prime number
+     * - therefore we only need to check up to the √number
      *
      * @param number - number to be checked
      * @return true if the given number is prime, false otherwise
