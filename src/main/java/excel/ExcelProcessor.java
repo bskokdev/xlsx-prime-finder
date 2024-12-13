@@ -28,9 +28,9 @@ public class ExcelProcessor {
      *
      * @throws RuntimeException if the file cannot be found or read for some reason
      */
-    public void processPrimeNumbers() throws RuntimeException {
+    public void processPrimeNumbers(int sheetIndex, int columnIndex) throws RuntimeException {
         try (FileInputStream fis = new FileInputStream(filePath); Workbook workbook = new XSSFWorkbook(fis)) {
-            Sheet sheet = workbook.getSheetAt(0);
+            Sheet sheet = workbook.getSheetAt(sheetIndex);
             int rowCount = sheet.getPhysicalNumberOfRows();
             for (int i = 0; i < rowCount; i++) {
                 Row row = sheet.getRow(i);
@@ -39,7 +39,7 @@ public class ExcelProcessor {
                     continue;
                 }
 
-                long rowResult = processRow(row, 1);
+                long rowResult = processRow(row, columnIndex);
                 if (rowResult != -1) {
                     log.info("FOUND PRIME: {}", rowResult);
                 }

@@ -92,11 +92,11 @@ class ExcelProcessorTest {
         try (Workbook workbook = new XSSFWorkbook(tempExcelFile)) {
             Sheet sheet = workbook.getSheetAt(0);
 
-            assertEquals(2L, processor.processRow(sheet.getRow(1)), "Row with value 2 should return prime 2");
-            assertEquals(-1L, processor.processRow(sheet.getRow(2)), "Row with value 4 should return -1");
-            assertEquals(17L, processor.processRow(sheet.getRow(3)), "Row with value 17 should return prime 17");
-            assertEquals(-1L, processor.processRow(sheet.getRow(6)), "Row with value 'Invalid' should return -1");
-            assertEquals(-1L, processor.processRow(sheet.getRow(7)), "Row with value -7 should return -1");
+            assertEquals(2L, processor.processRow(sheet.getRow(1), 1), "Row with value 2 should return prime 2");
+            assertEquals(-1L, processor.processRow(sheet.getRow(2), 1), "Row with value 4 should return -1");
+            assertEquals(17L, processor.processRow(sheet.getRow(3), 1), "Row with value 17 should return prime 17");
+            assertEquals(-1L, processor.processRow(sheet.getRow(6), 1), "Row with value 'Invalid' should return -1");
+            assertEquals(-1L, processor.processRow(sheet.getRow(7), 1), "Row with value -7 should return -1");
         }
     }
 }

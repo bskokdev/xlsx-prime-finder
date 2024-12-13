@@ -13,7 +13,7 @@ public class Main {
         }
         String filePath = args[0];
         ExcelProcessor excelProcessor = new ExcelProcessor(filePath);
-        excelProcessor.processPrimeNumbers();
+        excelProcessor.processPrimeNumbers(0, 1);
     }
 
     /**
