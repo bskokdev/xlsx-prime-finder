@@ -34,11 +34,6 @@ public class ExcelProcessor {
             int rowCount = sheet.getPhysicalNumberOfRows();
             for (int i = 0; i < rowCount; i++) {
                 Row row = sheet.getRow(i);
-                if (row == null) {
-                    log.debug("Null row at index: {}", i);
-                    continue;
-                }
-
                 long rowResult = processRow(row, columnIndex);
                 if (rowResult != -1) {
                     log.info("FOUND PRIME: {}", rowResult);
@@ -57,17 +52,21 @@ public class ExcelProcessor {
      * @return a number if the number is valid and prime, -1 in all other cases
      */
     public long processRow(Row row, int cellIndex) {
+        if (row == null) {
+            return -1;
+        }
+
         int rowNumber = row.getRowNum();
-        Cell secondCell = row.getCell(cellIndex); // data are in the second column
-        if (!isCellValid(secondCell)) {
+        Cell targetCell = row.getCell(cellIndex); // data are in the second column
+        if (!isCellValid(targetCell)) {
             log.debug("Invalid cell value, skipping row: {} (Possibly header or a non-numeric value)", rowNumber);
             return -1;
         }
 
         try {
-            long number = switch (secondCell.getCellType()) {
-                case NUMERIC -> (long) secondCell.getNumericCellValue();
-                case STRING -> Long.parseLong(secondCell.getStringCellValue().trim());
+            long number = switch (targetCell.getCellType()) {
+                case NUMERIC -> (long) targetCell.getNumericCellValue();
+                case STRING -> Long.parseLong(targetCell.getStringCellValue().trim());
                 default -> -1;
             };
             if (number != -1 && isPrime(number)) {
@@ -75,6 +74,7 @@ public class ExcelProcessor {
             }
         } catch (NumberFormatException e) {
             log.debug("Failed to parse number at row: {}, skipping this row", rowNumber);
+            return -1;
         }
 
         return -1;
@@ -91,24 +91,19 @@ public class ExcelProcessor {
             return false;
         }
         log.debug("Processing cell of type: {}", cell.getCellType());
-        switch (cell.getCellType()) {
-            case NUMERIC -> {
-                return isPositiveInteger(cell.getNumericCellValue());
-            }
+        return switch (cell.getCellType()) {
+            case NUMERIC -> isPositiveInteger(cell.getNumericCellValue());
             case STRING -> {
                 String cellStringValue = cell.getStringCellValue().trim();
                 // Here we could also iterate over the string and for each char check if it's a number using Character.isDigit()
                 // But the regex is much simpler to implement, read, and it's faster in this case
                 if (cellStringValue.matches("\\d+")) {
-                    return isPositiveInteger(Double.parseDouble(cellStringValue));
+                    yield isPositiveInteger(Double.parseDouble(cellStringValue));
                 }
-                return false;
+                yield false;
             }
-            default -> {
-                // reject any other cell type
-                return false;
-            }
-        }
+            default -> false; // reject any other type
+        };
     }
 
     /**
