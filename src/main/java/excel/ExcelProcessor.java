@@ -48,7 +48,7 @@ public class ExcelProcessor {
      * Processes a single row in the sheet, including validation.
      *
      * @param row       - A single row in the sheet to be processed
-     * @param cellIndex - Index of the cell to process
+     * @param cellIndex - Index of the cell to process (left -> right)
      * @return a number if the number is valid and prime, -1 in all other cases
      */
     public long processRow(Row row, int cellIndex) {
@@ -57,7 +57,7 @@ public class ExcelProcessor {
         }
 
         int rowNumber = row.getRowNum();
-        Cell targetCell = row.getCell(cellIndex); // data are in the second column
+        Cell targetCell = row.getCell(cellIndex);
         if (!isCellValid(targetCell)) {
             log.debug("Invalid cell value, skipping row: {} (Possibly header or a non-numeric value)", rowNumber);
             return -1;
